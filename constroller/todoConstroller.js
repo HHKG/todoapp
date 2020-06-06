@@ -5,7 +5,7 @@ var bodyParser=require('body-parser');
 var mongoose=require('mongoose');
 
 //连接数据库
-mongoose.connect('mongodb+srv://todoapp:todoapp@cluster0-w2o0w.mongodb.net/test?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://todoapp:todoapp@cluster0-w2o0w.mongodb.net/test?retryWrites=true&w=majority',{useUnifiedTopology: true,useNewUrlParser: true})
 
 //创建一个图表
 var todoSchema=new mongoose.Schema({
@@ -32,13 +32,16 @@ var urlencodedParser=bodyParser.urlencoded({extended:false});
 // ];
 
 module.exports=function(app){
+	
+	//浏览器地址输入：localhost:3000/todo时执行这里的函数
     app.get('/todo',function(req,res){
+		
         //查找数据库中是否有数据，{}代表查找整个数据库
         Todo.find({},function(err,data){
             if(err) throw err;
             console.log(data);
             //把查找到的数据，通过render传递到路由为todo的ejs页面
-            res.render('todo',{todos:data});
+            res.json(data);
         });
     });
 
@@ -46,7 +49,7 @@ module.exports=function(app){
     app.post('/todo',urlencodedParser,function(req,res){
         Todo(req.body).save(function(err,data){
             if(err) throw err;
-            res.json(data);//把数据回调给成功回调函数
+            res.json(data.body);//把数据回调给成功回调函数
         });
     });
 
